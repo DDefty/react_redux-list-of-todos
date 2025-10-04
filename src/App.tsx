@@ -10,8 +10,7 @@ import { Loader } from './components/Loader';
 import { getUser } from './api';
 import { Todo } from './types/Todo';
 import { User } from './types/User';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from './app/store';
+import { useAppDispatch, useAppSelector } from './app/hooks';
 import { fetchTodosRequested } from './features/todoSlice';
 import { SETBYID, REMOVE } from './features/currentTodoSlice';
 
@@ -19,15 +18,15 @@ import { Status } from './types/Status';
 import { SET_STATUS, SET_QUERY } from './features/filterSlice';
 
 export const App: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { data, loading } = useSelector((s: RootState) => s.todos);
+  const dispatch = useAppDispatch();
+  const { data, loading } = useAppSelector(s => s.todos);
   //const [filterTodos, setFilterTodos] = useState<Filter>('all');
   const [user, setUser] = useState<User | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const { todo } = useSelector((s: RootState) => s.currentTodo);
+  const { todo } = useAppSelector(s => s.currentTodo);
   //const [searchQuery, setSearchQuery] = useState('');
   const [selectedTodoId, setSelectedTodoId] = useState<number | null>(null);
-  const { query, status } = useSelector((s: RootState) => s.filter);
+  const { query, status } = useAppSelector(s => s.filter);
 
   useEffect(() => {
     dispatch(fetchTodosRequested());

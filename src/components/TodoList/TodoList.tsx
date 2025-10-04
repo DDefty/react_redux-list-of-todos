@@ -2,11 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { Todo } from '../../types/Todo';
-import { Filter } from '../../App';
+import { Status } from '../../types/Status';
 
 type TodoProps = {
   todos: Todo[] | null;
-  filter: Filter;
+  filter: Status;
   onTodoSelect: (Id: number, todo: Todo) => void;
   searchQuery?: string;
   selectedTodoId?: number | null;
