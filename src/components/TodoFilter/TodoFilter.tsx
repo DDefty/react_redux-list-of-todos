@@ -1,9 +1,9 @@
-import { Filter } from '../../App';
+import { Status } from '../../types/Status';
 import React from 'react';
 
 type Props = {
-  filter: Filter;
-  onFilterChange: (filter: Filter) => void;
+  filter: Status;
+  onFilterChange: (filter: Status) => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
 };
@@ -25,8 +25,8 @@ export const TodoFilter: React.FC<Props> = ({
           <select
             data-cy="statusSelect"
             value={filter}
-            onChange={e => {
-              const newFilter = e.target.value as Filter;
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+              const newFilter = e.target.value as Status;
 
               onFilterChange(newFilter);
             }}
@@ -45,7 +45,9 @@ export const TodoFilter: React.FC<Props> = ({
           className="input"
           placeholder="Search..."
           value={searchQuery}
-          onChange={e => onSearchChange(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            onSearchChange(e.target.value)
+          }
         />
         <span className="icon is-left">
           <i className="fas fa-magnifying-glass" />
@@ -59,6 +61,7 @@ export const TodoFilter: React.FC<Props> = ({
               type="button"
               className="delete"
               onClick={handleClearSearch}
+              aria-label="Clear search"
             />
           </span>
         )}

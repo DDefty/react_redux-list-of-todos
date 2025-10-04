@@ -7,11 +7,11 @@ import { TodoList } from './components/TodoList';
 import { TodoFilter } from './components/TodoFilter';
 import { TodoModal } from './components/TodoModal';
 import { Loader } from './components/Loader';
-import { getUser } from './api';
+import { getUser, getTodos } from './api';
 import { Todo } from './types/Todo';
 import { User } from './types/User';
 import { useAppDispatch, useAppSelector } from './app/hooks';
-import { fetchTodosRequested } from './features/todoSlice';
+import { setTodos } from './features/todoSlice';
 import { SETBYID, REMOVE } from './features/currentTodoSlice';
 
 import { Status } from './types/Status';
@@ -19,7 +19,9 @@ import { SET_STATUS, SET_QUERY } from './features/filterSlice';
 
 export const App: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { data, loading } = useAppSelector(s => s.todos);
+  const todos = useAppSelector(s => s.todos);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   //const [filterTodos, setFilterTodos] = useState<Filter>('all');
   const [user, setUser] = useState<User | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -29,19 +31,44 @@ export const App: React.FC = () => {
   const { query, status } = useAppSelector(s => s.filter);
 
   useEffect(() => {
-    dispatch(fetchTodosRequested());
+    const fetchTodos = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const todosData = await getTodos();
+
+        dispatch(setTodos(todosData));
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Failed to load todos';
+
+        setError(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTodos();
   }, [dispatch]);
 
   const handleFilterChange = (filter: Status) => {
     dispatch(SET_STATUS({ status: filter }));
   };
 
-  const handleTodoSelect = (Id: number, selectedTodo: Todo) => {
+  const handleTodoSelect = async (userId: number, selectedTodo: Todo) => {
     setIsOpen(true);
     setSelectedTodoId(selectedTodo.id);
     dispatch(SETBYID(selectedTodo.id));
     setUser(null); // Reset user when opening modal
-    getUser(Id).then(setUser);
+
+    try {
+      const userData = await getUser(userId);
+
+      setUser(userData);
+    } catch (err) {
+      // Could set an error state here if needed
+      void err; // Explicitly acknowledge we're not using the error
+    }
   };
 
   const handleModalClose = () => {
@@ -77,8 +104,9 @@ export const App: React.FC = () => {
 
             <div className="block">
               {loading && <Loader />}
+              {error && <div className="notification is-danger">{error}</div>}
               <TodoList
-                todos={data}
+                todos={todos}
                 filter={status}
                 onTodoSelect={handleTodoSelect}
                 searchQuery={query}
