@@ -5,19 +5,26 @@ type TodoState = {
   data: Todo[];
   loading: boolean;
   error?: string;
-}
+};
 
-const initialState: TodoState = {data: [], loading: false};
+const initialState: TodoState = { data: [], loading: false };
 
 const todoSlice = createSlice({
   name: 'todos',
   initialState,
   reducers: {
-    fetchTodosRequested: (s) => { s.loading = true; s.error = undefined; },
-    fetchTodosSucceeded: (s, a: PayloadAction<Todo[]>) => { s.loading = false; s.data = a.payload; },
-    fetchTodosFailed: (s, a: PayloadAction<string>) => { s.loading = false; s.error = a.payload; },
+    fetchTodosRequested: state => {
+      return { ...state, loading: true, error: undefined };
+    },
+    fetchTodosSucceeded: (state, action: PayloadAction<Todo[]>) => {
+      return { ...state, loading: false, data: action.payload };
+    },
+    fetchTodosFailed: (state, action: PayloadAction<string>) => {
+      return { ...state, loading: false, error: action.payload };
+    },
   },
 });
 
-export const { fetchTodosRequested, fetchTodosSucceeded, fetchTodosFailed } = todoSlice.actions;
+export const { fetchTodosRequested, fetchTodosSucceeded, fetchTodosFailed } =
+  todoSlice.actions;
 export default todoSlice.reducer;

@@ -37,10 +37,10 @@ export const App: React.FC = () => {
     dispatch(SET_STATUS({ status: filter }));
   };
 
-  const handleTodoSelect = (Id: number, todo: Todo) => {
+  const handleTodoSelect = (Id: number, selectedTodo: Todo) => {
     setIsOpen(true);
-    setSelectedTodoId(todo.id);
-    dispatch(SETBYID(todo.id));
+    setSelectedTodoId(selectedTodo.id);
+    dispatch(SETBYID(selectedTodo.id));
     setUser(null); // Reset user when opening modal
     getUser(Id).then(setUser);
   };
@@ -56,8 +56,8 @@ export const App: React.FC = () => {
     setSelectedTodoId(null);
   };
 
-  const handleSearchChange = (query: string) => {
-    dispatch(SET_QUERY({ query }));
+  const handleSearchChange = (searchQuery: string) => {
+    dispatch(SET_QUERY({ query: searchQuery }));
   };
 
   return (

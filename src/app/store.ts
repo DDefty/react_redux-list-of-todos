@@ -1,5 +1,9 @@
 import { configureStore, createListenerMiddleware } from '@reduxjs/toolkit';
-import todoReducer, { fetchTodosRequested, fetchTodosSucceeded, fetchTodosFailed } from '../features/todoSlice';
+import todoReducer, {
+  fetchTodosRequested,
+  fetchTodosSucceeded,
+  fetchTodosFailed,
+} from '../features/todoSlice';
 import currentTodoReducer, { SET, SETBYID } from '../features/currentTodoSlice';
 import filterReducer from '../features/filterSlice';
 
@@ -12,9 +16,13 @@ listener.startListening({
   effect: async (_action, api) => {
     try {
       const data = await getTodos();
+
       api.dispatch(fetchTodosSucceeded(data));
-    } catch (e: any) {
-      api.dispatch(fetchTodosFailed(e?.message ?? 'Failed to load user'));
+    } catch (e: unknown) {
+      const errorMessage =
+        e instanceof Error ? e.message : 'Failed to load user';
+
+      api.dispatch(fetchTodosFailed(errorMessage));
     }
   },
 });
@@ -25,18 +33,20 @@ listener.startListening({
     const state = api.getState() as RootState;
     const todoId = action.payload;
     const foundTodo = state.todos.data.find(todo => todo.id === todoId);
-    
+
     if (foundTodo) {
       api.dispatch(SET(foundTodo));
     }
   },
 });
 
-
-
 export const store = configureStore({
-  reducer: { todos: todoReducer, currentTodo: currentTodoReducer, filter:filterReducer },
-  middleware: (gDM) => gDM().prepend(listener.middleware),
+  reducer: {
+    todos: todoReducer,
+    currentTodo: currentTodoReducer,
+    filter: filterReducer,
+  },
+  middleware: gDM => gDM().prepend(listener.middleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

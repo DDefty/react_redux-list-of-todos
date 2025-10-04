@@ -10,14 +10,18 @@ const currentTodoSlice = createSlice({
   initialState,
   reducers: {
     SET: (state, action: PayloadAction<Todo>) => {
-      state.todo = action.payload;
+      return { ...state, todo: action.payload };
     },
-    SETBYID: (_state, _action: PayloadAction<number>) => {
+    SETBYID: (state, action: PayloadAction<number>) => {
       // This reducer will be handled by middleware to find todo by ID
-      // The actual todo will be set by setCurrentTodo action
+      // The actual todo will be set by SET action
+      // The action payload is used by the middleware, not here
+      void action; // Explicitly acknowledge we're not using it in this reducer
+
+      return state;
     },
-    REMOVE: (state) => {
-      state.todo = undefined;
+    REMOVE: state => {
+      return { ...state, todo: undefined };
     },
   },
 });
